@@ -3,3 +3,6 @@
     color: green;
     padding-bottom: 12px;
 }
+.italic {
+    font-style: italic;
+}

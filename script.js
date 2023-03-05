@@ -1,27 +1,57 @@
-ol.innerHTML = localStorage.getItem("list");
 
-form.onsubmit = () => {
-  const li = document.createElement("li");
-  const spanDel = document.createElement("span");
-  spanDel.textContent = " -";
-  spanDel.onclick = () => del(li);
-  li.innerHTML = champ.value + "";
-  li.appendChild(spanDel);
-  ol.appendChild(li);
-  champ.value = "";
-  noTache.style.display = "none";
 
-  localStorage.setItem("list", ol.innerHTML);
+/**
+ * Crée un élément HTML qui retourne un article
+ * @param {(title:string, body:string)} post 
+ * @return {HTMLElement}
+ * return
+ */
 
-  return false;
-  //   e.preventDefault();
-};
+function createArticle(post) {
 
-const del = (element) => {
-  element.remove();
+  const article = document.createElement('article')
 
-  //   if (ol.innerHTML == "") {
-  //     noTache.style.display = "block";
-  //   }
-  noTache.style.display = ol.innerHTML === "" ? "block" : "none";
-};
+  article.innerHTML = `
+  <h2>${post.title}</h2>
+  <p>${post.body}</p>
+  <br><br>
+  `
+  return article
+}
+
+
+async function main() {
+
+  const wrapper = document.querySelector('#lastposts')
+  const loader = document.createElement('p')
+
+  loader.innerText = 'chargement...'
+  wrapper.append(loader)
+
+  try {
+
+
+    const r = await fetch('https://jsonplaceholder.typicode.com/posts?limit=5', {
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+    if (!r.ok) {
+      throw new Error('Erreur serveur')
+    }
+    const posts = await r.json()
+
+
+    loader.remove()
+    for (let post of posts) {
+      wrapper.append(createArticle(post))
+    }
+
+
+  } catch (error) {
+    loader.innerText = 'Impossible de charger les articles'
+    loader.style.color = 'red'
+    return
+  }
+}
+main()
